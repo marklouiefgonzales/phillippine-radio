@@ -1,0 +1,309 @@
+<html lang="en">
+<!-- marksays: I created this para hindi nagppause yung stream pag may ads... created this on 03 Jun 2026-->
+<!-- marksays: Still pretty 'spaghetti', later I would make it easier to add radio stations on list (e.g. name, link)-->
+<!-- marksays: Another idea is a bigger pause button so it can instantly be stopped.. lalo kung may call-->
+<!-- marksays: 6/12/26 this version is cleaner and solves the button color issue dun sa pause button. -->
+<!-- marksays: 6/12/26 probably next time e may option naman to dynamically change the station from a list -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>Radio Player by the Gonzales</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+            width: 100%;
+        }
+        .player-container {
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 350px;
+            box-sizing: border-box;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .player-container.active {
+            border-color: #0084ff;
+            background: #222630;
+        }
+        h2 {
+            margin-bottom: 5px;
+            font-size: 24px;
+            color: #0084ff;
+        }
+        p {
+            color: #aaaaaa;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        /* New Container: Places the master audio bar and the panic button side-by-side */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            max-width: 440px; /* Expanded slightly to house both modules seamlessly */
+            justify-content: center;
+        }
+        .master-bar-box {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            flex-grow: 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        audio {
+            width: 100%;
+            outline: none;
+            display: block;
+        }
+        
+        /* Panic Button Layout Styles */
+        .panic-btn {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            width: 68px;
+            height: 68px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+            transition: all 0.2s ease;
+        }
+        .panic-btn:hover {
+            background: #e02e24;
+            transform: scale(1.05);
+        }
+        .panic-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            background: #252525;
+            color: #aaaaaa;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid #333333;
+            transition: all 0.3s ease;
+        }
+        .explore-btn:hover {
+            background: #0084ff;
+            color: #ffffff;
+            border-color: #0084ff;
+            box-shadow: 0 0 15px rgba(0, 132, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+
+
+        /* Force container layout alignment rules */
+        .pause-icon {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            height: 24px;
+        }
+        /* Draws crisp, thick, perfectly proportional white rectangle pillars */
+        .pause-icon .bar {
+            background-color: white;
+            width: 6px;
+            height: 100%;
+            border-radius: 2px;
+        }
+        
+        /* Draws a clean, centered vector Play triangle when paused */
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 20px solid white;
+            margin-left: 4px; /* Optically centers the triangle pointing right */
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        
+        <div class="cards-container">
+            <div class="player-container active" id="card1" onclick="playStream('https://hrmanila.radioca.st/stream', 'card1')">
+                <h2>97.9 Home Radio</h2>
+                <p>Always Be Home</p>
+                <div id="status1" style="font-size: 12px; color: #0084ff;">● Click to Play</div>
+            </div>
+
+            <div class="player-container" id="card2" onclick="playStream('https://stream-285.zeno.fm/hcbrvvfd938uv', 'card2')">
+                <h2>89.9 Magic</h2>
+                <p>Today's Best Music</p>
+                <div id="status2" style="font-size: 12px; color: #aaaaaa;">Click to Play</div>
+            </div>
+        </div>
+
+        <!-- Master Row Grid housing both the audio stream controller and your hotkey panel -->
+        <div class="controls-row">
+            <div class="master-bar-box">
+                <audio id="globalPlayer" controls crossorigin="anonymous" onplay="handleNativePlay()" onpause="handleNativePause()">
+                    <source id="audioSource" src="https://hrmanila.radioca.st/stream" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <!-- The Master Pause/Play Button -->
+		<button class="panic-btn" id="masterPauseBtn" onclick="togglePlayback()" title="Quick Pause/Play">
+    		<!-- Using pure HTML/CSS layout blocks ensures it renders identically on every screen -->
+    			<div class="pause-icon">
+        			<div class="bar"></div>
+        			<div class="bar"></div>
+    			</div>
+		</button>
+        </div>
+
+        <a href="https://radio-philippines.com" target="_blank" class="explore-btn">
+            🌐 Explore More Philippine Stations
+        </a>
+    </div>
+
+    <script>
+	// marksays: onload value
+		
+	var statSelected = 'status1';
+	togglePlayback();
+	document.getElementById(statSelected).innerText = 'Click to Play';
+	var btn = document.getElementById('masterPauseBtn');
+	btn.innerHTML = '<div class="play-icon"></div>';
+        btn.style.background = "#34c759"; // Safe Green when paused
+        btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
+	
+		
+
+
+        function playStream(url, cardId) {
+            var player = document.getElementById('globalPlayer');
+            var btn = document.getElementById('masterPauseBtn');
+
+	    // Get the selected value
+	    if (cardId=='card1') {
+			statSelected = 'status1';
+		} else
+		{
+			statSelected = 'status2';
+		}
+
+            
+            // Clean up card visual styles
+            document.getElementById('card1').classList.remove('active');
+            document.getElementById('card2').classList.remove('active');
+            document.getElementById('status1').style.color = '#aaaaaa';
+            document.getElementById('status1').innerText = 'Click to Play';
+            document.getElementById('status2').style.color = '#aaaaaa';
+            document.getElementById('status2').innerText = 'Click to Play';
+            
+            // Set new active card styles
+            document.getElementById(cardId).classList.add('active');
+            document.getElementById(statSelected).style.color = '#0084ff';
+	    document.getElementById(statSelected).innerText = '● Now Playing';
+
+            
+            // Inject stream directly into audio engine source element
+            player.src = url;
+            player.load();
+            player.play();
+            
+            // Keep button display synced to active state
+            btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
+            btn.style.background = "#ff3b30";
+            btn.style.boxShadow = "0 4px 12px rgba(255, 59, 48, 0.3)";
+
+	    
+        }
+
+        // Logic function handling instant master pause/play toggle commands
+        function togglePlayback() {
+            var player = document.getElementById('globalPlayer');
+            var btn = document.getElementById('masterPauseBtn');
+            
+            if (player.paused) {
+                player.play();
+                btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
+                btn.style.background = "#ff3b30"; // Bright Red when playing
+                btn.style.boxShadow = "0 4px 12px rgba(255, 59, 48, 0.3)";
+		document.getElementById(statSelected).innerText = '● Now Playing';
+            } else {
+                player.pause();
+                btn.innerHTML = '<div class="play-icon"></div>';
+                btn.style.background = "#34c759"; // Safe Green when paused
+                btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
+		document.getElementById(statSelected).innerText = '● Paused';
+            }	
+        }
+
+
+	function handleNativePlay() {
+        	var btn = document.getElementById('masterPauseBtn');
+        	btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
+        	btn.style.background = "#ff3b30";
+        	btn.style.boxShadow = "0 4px 12px rgba(255, 59, 48, 0.3)";
+		document.getElementById(statSelected).innerText = '● Now Playing';
+	}
+
+	function handleNativePause() {
+        	var btn = document.getElementById('masterPauseBtn');
+        	btn.innerHTML = '<div class="play-icon"></div>';
+        	btn.style.background = "#34c759";
+        	btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
+		document.getElementById(statSelected).innerText = '● Paused';
+	}
+
+
+
+    </script>
+
+</body>
+</html>
