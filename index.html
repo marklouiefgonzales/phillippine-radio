@@ -318,9 +318,9 @@
             { freq: "97.9",  name: "Home Radio",  tagline: "Always Be Home",        url: "https://hrmanila.radioca.st/stream" },
             { freq: "89.9",  name: "Magic",        tagline: "Today's Best Music",    url: "https://stream-285.zeno.fm/hcbrvvfd938uv" },
             { freq: "97.1",  name: "Barangay LS",  tagline: "TUGStugan Na",       url: "https://magic.radioca.st/stream" },
-            { freq: "101",  name: "No Station 1",  tagline: "TUGStugan Na",       url: "https://magic.radiocasda.st/streamasd" },
-            { freq: "102",  name: "No Station 2",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "103",  name: "No Station 3",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
+            { freq: "101",  name: "No Station A",  tagline: "TUGStugan Na",       url: "https://magic.radiocasda.st/streamasd" },
+            { freq: "102",  name: "No Station B",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
+            { freq: "103",  name: "No Station C",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
         ];
         // ============================================================
 
@@ -398,9 +398,10 @@
         // ── Toggle playback ───────────────────────────────────────────
 
         function togglePlayback() {
+            if (streamError) return;
             var player = document.getElementById("globalPlayer");
             var btn = document.getElementById("masterPauseBtn");
-
+        
             if (player.paused) {
                 player.play();
                 btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
