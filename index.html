@@ -318,16 +318,6 @@
             { freq: "97.9",  name: "Home Radio",  tagline: "Always Be Home",        url: "https://hrmanila.radioca.st/stream" },
             { freq: "89.9",  name: "Magic",        tagline: "Today's Best Music",    url: "https://stream-285.zeno.fm/hcbrvvfd938uv" },
             { freq: "97.1",  name: "Barangay LS",  tagline: "TUGStugan Na",       url: "https://magic.radioca.st/stream" },
-            { freq: "101",  name: "No Station A",  tagline: "TUGStugan Na",       url: "https://magic.radiocasda.st/streamasd" },
-            { freq: "102",  name: "No Station B",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "103",  name: "No Station C",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "104",  name: "No Station D",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "105",  name: "No Station E",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "106",  name: "No Station F",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "107",  name: "No Station G",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "108",  name: "No Station H",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "109",  name: "No Station I",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
-            { freq: "110",  name: "No Station J",  tagline: "TUGStugan Na",       url: "https://magic.radiocaasd.st/stream" },
         ];
         // ============================================================
 
@@ -339,7 +329,9 @@
 
         // On load: render cards then autoplay card1
         renderCards();
-        playStream(0, "card1");
+        var lastSlot = parseInt(localStorage.getItem("lastPlayingSlot") || "0");
+        var lastCardId = "card" + (lastSlot + 1);
+        playStream(lastSlot, lastCardId);
 
 
         // ── Load / Save ───────────────────────────────────────────────
@@ -399,6 +391,8 @@
             btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
             btn.style.background = "#ff3b30";
             btn.style.boxShadow = "0 4px 12px rgba(255, 59, 48, 0.3)";
+
+            localStorage.setItem("lastPlayingSlot", slot);
         }
 
 
