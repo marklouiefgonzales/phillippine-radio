@@ -328,6 +328,7 @@
         var cardSelections = loadSelections();
         var editingCardSlot = null;
         var statSelected = "status1";
+        var streamError = false;
 
         // On load: render cards then autoplay card1
         renderCards();
@@ -362,6 +363,7 @@
         // ── Play by slot ──────────────────────────────────────────────
 
         function playStream(slot, cardId) {
+            streamError = false;
             var player = document.getElementById("globalPlayer");
             var btn = document.getElementById("masterPauseBtn");
             var s = stations[cardSelections[slot]];
@@ -432,6 +434,7 @@
         }
 
         function handleNativePause() {
+            if (streamError) return;
             var btn = document.getElementById("masterPauseBtn");
             btn.innerHTML = '<div class="play-icon"></div>';
             btn.style.background = "#34c759";
@@ -493,9 +496,8 @@
         }
 
         function handleStreamError() {
-            var player = document.getElementById("globalPlayer");
+            streamError = true;
             var btn = document.getElementById("masterPauseBtn");
-            player.pause();
             btn.innerHTML = '<div class="play-icon"></div>';
             btn.style.background = "#34c759";
             btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
