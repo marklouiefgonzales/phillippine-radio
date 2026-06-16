@@ -317,7 +317,7 @@
         var stations = [
             { freq: "97.9",  name: "Home Radio",  tagline: "Always Be Home",        url: "https://hrmanila.radioca.st/stream" },
             { freq: "89.9",  name: "Magic",        tagline: "Today's Best Music",    url: "https://stream-285.zeno.fm/hcbrvvfd938uv" },
-            { freq: "97.1",  name: "Barangay LS",  tagline: "TUGStugan Na!",       url: "https://magic.radioca.st/stream" },
+            { freq: "97.1",  name: "Barangay LS",  tagline: "TUGStugan Na",       url: "https://magic.radioca.st/stream" },
             { freq: "99.5",  name: "RT",           tagline: "Real Talk Radio",       url: "https://stream-285.zeno.fm/rt995" },
             { freq: "103.5", name: "K-Lite FM",    tagline: "Easy Listening",        url: "https://stream.klite.com.ph/stream" },
             { freq: "105.1", name: "Crossover",    tagline: "The Music Never Stops", url: "https://crossoverfm.radioca.st/stream" },
@@ -478,16 +478,12 @@
 
         function selectStation() {
             var index = parseInt(this.getAttribute("data-index"));
-            cardSelections[editingCardSlot] = index;
+            var slot = editingCardSlot;
+            cardSelections[slot] = index;
             saveSelections();
             renderCards();
+            playStream(slot, "card" + (slot + 1));
             closeModal();
-        
-            // Small delay to let the modal close first before playing
-            var slot = editingCardSlot;
-            setTimeout(function() {
-                playStream(slot, "card" + (slot + 1));
-            }, 100);
         }
 
         function closeModal() {
