@@ -513,6 +513,17 @@
             document.getElementById(statSelected).innerText = "⚠ Stream Unavailable";
         }
 
+
+        window.addEventListener("popstate", function(event) {
+            if (confirm("Exit Philippine Radio?")) {
+                window.history.go(-1);
+            } else {
+                window.history.pushState(null, null, window.location.href);
+            }
+        });
+        
+        // Push initial state so back button is interceptable
+        window.history.pushState(null, null, window.location.href);
         
     </script>
 
