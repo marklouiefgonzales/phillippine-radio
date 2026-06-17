@@ -2,9 +2,11 @@
 <!-- marksays: I created this para hindi nagppause yung stream pag may ads... created this on 03 Jun 2026-->
 <!-- marksays: Still pretty 'spaghetti', later I would make it easier to add radio stations on list (e.g. name, link)-->
 <!-- marksays: Another idea is a bigger pause button so it can instantly be stopped.. lalo kung may call-->
-<!-- marksays: 6/12/26 this version is cleaner and solves the button color issue dun sa pause button. -->
-<!-- marksays: 6/12/26 probably next time e may option naman to dynamically change the station from a list -->
-<!-- marksays: 6/16/26 done! cards are now dynamic. edit button per card. last selected is remembered. -->
+<!-- marksays: 6/12/26 This version is cleaner and solves the button color issue dun sa pause button. -->
+<!-- marksays: 6/12/26 Probably next time e may option naman to dynamically change the station from a list -->
+<!-- marksays: 6/16/26 Done! cards are now dynamic. edit button per card. last selected is remembered. -->
+<!-- marksays: 6/17/26 Completed all the stations in Metro Manila -->
+<!-- marksays: 6/17/26 Next, I will make the stations searchable -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -318,15 +320,29 @@
         var stations = [
             { freq: "97.9", name: "Home Radio",  tagline: "Always Be Home", url: "https://hrmanila.radioca.st/stream" },
             { freq: "89.9", name: "Magic", tagline: "Today's Best Music", url: "https://stream-285.surfernetwork.com/hcbrvvfd938uv" },
+            { freq: "87.5", name: "Republika FM1", tagline: "Ang Pambansang Soundtrip", url: "http://58.97.187.52:5007/fm1" },
+            { freq: "88.3", name: "Jam", tagline: "We Rock Radio", url: "http://ph-icecast.eradioportal.com:8000/jam883" },
+            { freq: "89.1", name: "AWR Manila", tagline: "Spreading the Warmth of God's Love", url: "http://192.53.113.120:8000/stream?type=.mp3" },
             { freq: "90.7", name: "Love Radio", tagline: "Kailangan pa bang i-memorize 'yan?", url: "https://azura.loveradio.com.ph/listen/love_radio_manila/radio.mp3" },
             { freq: "91.5", name: "Win Radio", tagline: "Pinag-iisipan Pa Ba 'Yan?!", url: "https://stream-04.surfernetwork.com/2ss1hgnu6hhvv" },
+            { freq: "92.3", name: "FM Radio", tagline: "Your Favorite Music Radio", url: "http://us1.amfmph.com:8872/stream?type=.aac" },
             { freq: "93.1", name: "Monster Radio", tagline: "Manila's Hottest!", url: "https://in-icecast.eradioportal.com:8443/monsterrrx" },
+            { freq: "93.9", name: "iFM", tagline: "Ang Idol Mong FM", url: "https://stream.zeno.fm/sx15fznq0y5tv" },
             { freq: "94.7", name: "Mellow Touch", tagline: "Your Playlist Made Better", url: "https://streamer.radio.co/sec36cd5f1/listen" },
             { freq: "95.5", name: "Eagle FM", tagline: "For The Love Of Music", url: "https://n07.radiojar.com/yus0r2bghd3vv" },
             { freq: "96.3", name: "Easy Rock", tagline: "Just the Right Rock", url: "https://azura.easyrock.com.ph/listen/easy_rock_manila/radio.mp3" },
-            { freq: "97.1", name: "Barangay LS", tagline: "TUGStugan Na", url: "https://magic.radioca.st/stream" },
+            { freq: "97.1", name: "Barangay LS", tagline: "TUGStugan Na", url: "https://stream.zeno.fm/dphe9050afhvv" },
+            { freq: "98.7", name: "DZFE", tagline: "The Master's Touch", url: "http://sg-icecast.eradioportal.com:8000/febc_dzfe" },
+            { freq: "99.5", name: "XFM", tagline: "Katropa Mo, Xciting!", url: "https://prox.radyoph.com/s/346e90a13a75701e0bef5fefd181872f" },
+            { freq: "100.3", name: "RJFM", tagline: "The Greatest and The Latest", url: "https://stream.zeno.fm/as29d8g0g4duv" },
             { freq: "101.1", name: "Yes FM", tagline: "Solid", url: "https://azura.yesfm.com.ph/listen/yes_fm_manila/radio.mp3" },
+            { freq: "101.9", name: "MOR", tagline: "My Only Radio For Life! ", url: "https://22253.live.streamtheworld.com/MORFM_S01.mp3" },
             { freq: "102.7", name: "Star FM", tagline: "It's All For You", url: "https://stream-288.surfernetwork.com/536cwdq78heuv" },
+            { freq: "103.5", name: "All Radio", tagline: "All Hits, All Lite", url: "http://103.36.17.18:8000/stream" },
+            { freq: "104.3", name: "Capital", tagline: "Hitback Music Nation", url: "https://stream.zeno.fm/chynu17m108uv" },
+            { freq: "105.1", name: "Brigada News FM", tagline: "Ang Pambansang Balita at Musika", url: "http://18.141.67.248:8068/stream" },
+            { freq: "105.9", name: "True FM", tagline: "Dito Tayo sa Totoo!", url: "https://listen.mixlr.com/57536d5a63a3a19919e4db7ec98c7349" },
+            { freq: "106.7", name: "Energy FM", tagline: "Wag mong sabihing radyo, sabihin mo Energy!", url: "http://ph-icecast.eradioportal.com:8000/energyfm_manila" },
             { freq: "107.5", name: "Wish FM", tagline: "Wishers, keep on wishing!", url: "https://stream-288.surfernetwork.com/536cwdq78heuv" },
             { freq: "630", name: "DZMM TeleRadyo", tagline: "Una sa Balita, Una sa Public Service", url: "https://stream-280.surfernetwork.com/yaksrqvb35duv" },
             { freq: "🎄", name: "Christmas Radio 🎄", tagline: "Playing All The Best of Christmas Songs", url: "https://us1.amfmph.com/ssl/christmasradio?1641738050672=&mp=/stream" },
