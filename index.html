@@ -1,5 +1,5 @@
 <html lang="en">
-<!-- marksays: I created this para hindi nagppause yung stream pag may ads (https://www.radio-philippines.com/)... created this on 03 Jun 2026-->
+<!-- marksays: I created this para hindi nagppause yung stream pag may ads... created this on 03 Jun 2026-->
 <!-- marksays: Still pretty 'spaghetti', later I would make it easier to add radio stations on list (e.g. name, link)-->
 <!-- marksays: Another idea is a bigger pause button so it can instantly be stopped.. lalo kung may call-->
 <!-- marksays: 6/12/26 This version is cleaner and solves the button color issue dun sa pause button. -->
@@ -515,11 +515,6 @@
         var sleepFadeInterval = null;
         var sleepSecondsLeft = 0;
         var sleepCountdownInterval = null;
-        var recoveryTimeout = null;
-        var isRecovering = false;
-        var currentSlot = 0;
-        var recoveryAttempts = 0;
-        var maxRecoveryAttempts = 3;
         
         // On load: render cards then autoplay last played slot
         renderCards();
@@ -527,8 +522,6 @@
         var lastCardId = "card" + (lastSlot + 1);
         playStream(lastSlot, lastCardId);
         
-        // Start monitoring for stalled streams
-        setupAudioMonitoring();
         
         // ── Load / Save ───────────────────────────────────────────────
         
@@ -558,12 +551,7 @@
         // ── Play by slot ──────────────────────────────────────────────
         
         function playStream(slot, cardId) {
-            currentSlot = slot;
             streamError = false;
-            isRecovering = false;
-            clearTimeout(recoveryTimeout);
-            recoveryAttempts = 0; // Reset attempts when user manually changes station
-            
             var player = document.getElementById("globalPlayer");
             var btn = document.getElementById("masterPauseBtn");
             var s = stations[cardSelections[slot]];
@@ -581,21 +569,17 @@
             document.getElementById(statSelected).style.color = "#0084ff";
             document.getElementById(statSelected).innerText = "● Now Playing";
         
-            // Remove old listeners and add fresh ones
             player.removeEventListener("error", handleStreamError);
-            player.removeEventListener("stalled", handleStalled);
-            player.removeEventListener("waiting", handleStalled);
-            
             player.addEventListener("error", handleStreamError);
-            player.addEventListener("stalled", handleStalled);
-            player.addEventListener("waiting", handleStalled);
+
+            player.removeEventListener("stalled", handleStreamStall);
+            player.removeEventListener("waiting", handleStreamStall);
+            player.addEventListener("stalled", handleStreamStall);
+            player.addEventListener("waiting", handleStreamStall);
         
             player.src = s.url;
             player.load();
-            player.play().catch(function(e) {
-                console.log("Initial play error:", e);
-                handleStreamError();
-            });
+            player.play();
         
             btn.innerHTML = '<div class="pause-icon"><div class="bar"></div><div class="bar"></div></div>';
             btn.style.background = "#ff3b30";
@@ -611,177 +595,12 @@
                 });
             }
         }
-
-        // ── Setup audio monitoring (Battery-friendly) ──────────────────
-        function setupAudioMonitoring() {
-            var player = document.getElementById("globalPlayer");
-            
-            // Monitor for stalled/waiting events (these are triggered by the browser)
-            player.addEventListener("stalled", function() {
-                // Only attempt recovery if we're not already recovering
-                if (!isRecovering && !player.paused) {
-                    handleStalled();
-                }
-            });
-            
-            player.addEventListener("waiting", function() {
-                if (!isRecovering && !player.paused) {
-                    handleStalled();
-                }
-            });
-            
-            // Use Page Visibility API to check only when user returns to the app
-            document.addEventListener("visibilitychange", function() {
-                if (!document.hidden) {
-                    // User came back to the app - check if stream is still alive
-                    if (!player.paused && !streamError && player.src) {
-                        // Check if we've made progress in the last 30 seconds
-                        var currentTime = player.currentTime;
-                        var lastStoredTime = parseInt(localStorage.getItem("lastAudioTime") || "0");
-                        
-                        // If we were playing but no progress since last check, recover
-                        if (lastStoredTime > 0 && currentTime === lastStoredTime && currentTime > 0) {
-                            console.log("Stream frozen while app was hidden, recovering...");
-                            handleStalled();
-                        }
-                        
-                        // Store current time for next check
-                        localStorage.setItem("lastAudioTime", currentTime.toString());
-                    }
-                } else {
-                    // App went to background - store current time
-                    if (player.currentTime > 0) {
-                        localStorage.setItem("lastAudioTime", player.currentTime.toString());
-                    }
-                }
-            });
-            
-            // Use a less frequent check - only when the browser allows it
-            function idleCheck() {
-                if (!document.hidden && !player.paused && !isRecovering && player.src) {
-                    // Check if we've made progress in the last 30 seconds
-                    var currentTime = player.currentTime;
-                    var lastStoredTime = parseInt(localStorage.getItem("lastAudioTime") || "0");
-                    
-                    // Only check if we have a stored time
-                    if (lastStoredTime > 0) {
-                        // If more than 30 seconds passed with no progress
-                        if (currentTime === lastStoredTime && currentTime > 0) {
-                            console.log("Stream appears frozen, recovering...");
-                            handleStalled();
-                        }
-                    }
-                    
-                    // Update stored time
-                    if (currentTime > 0) {
-                        localStorage.setItem("lastAudioTime", currentTime.toString());
-                    }
-                }
-                
-                // Schedule next check only if we're still playing
-                if (!player.paused && player.src) {
-                    // Check every 30 seconds instead of 10
-                    setTimeout(idleCheck, 30000);
-                }
-            }
-            
-            // Start the idle check
-            setTimeout(idleCheck, 30000);
-        }
-
-        function handleStalled() {
-            var player = document.getElementById("globalPlayer");
-            
-            // Don't recover if already recovering, manually paused, or error state
-            if (isRecovering || player.paused || streamError) return;
-            
-            // Don't try too many times
-            if (recoveryAttempts >= maxRecoveryAttempts) {
-                console.log("Max recovery attempts reached, giving up");
-                return;
-            }
-            
-            // Check if there's buffered data
-            if (player.buffered.length > 0) {
-                var bufferedEnd = player.buffered.end(player.buffered.length - 1);
-                // If we have more than 5 seconds of buffer, don't recover yet
-                if (bufferedEnd - player.currentTime > 5) {
-                    return;
-                }
-            }
-            
-            isRecovering = true;
-            recoveryAttempts++;
-            
-            // Show recovery status
-            document.getElementById(statSelected).innerText = "⏳ Reconnecting...";
-            document.getElementById(statSelected).style.color = "#ffaa00";
-            
-            clearTimeout(recoveryTimeout);
-            recoveryTimeout = setTimeout(function() {
-                try {
-                    console.log("Attempting to recover stream (attempt " + recoveryAttempts + ")");
-                    var s = stations[cardSelections[currentSlot]];
-                    
-                    // Force reload
-                    player.removeEventListener("error", handleStreamError);
-                    player.src = '';
-                    player.load();
-                    
-                    setTimeout(function() {
-                        player.src = s.url;
-                        player.load();
-                        player.play().then(function() {
-                            console.log("Recovery successful");
-                            isRecovering = false;
-                            recoveryAttempts = 0; // Reset on success
-                            document.getElementById(statSelected).innerText = "● Now Playing";
-                            document.getElementById(statSelected).style.color = "#0084ff";
-                            player.addEventListener("error", handleStreamError);
-                        }).catch(function(e) {
-                            console.log("Recovery play failed:", e);
-                            isRecovering = false;
-                            if (recoveryAttempts >= maxRecoveryAttempts) {
-                                document.getElementById(statSelected).innerText = "⚠ Stream Unavailable";
-                                document.getElementById(statSelected).style.color = "#ff3b30";
-                                streamError = true;
-                            }
-                        });
-                    }, 500);
-                } catch (e) {
-                    console.log("Recovery error:", e);
-                    isRecovering = false;
-                }
-            }, 3000);
-        }
-
-        // ── Clean up on page unload ─────────────────────────────────────
-        window.addEventListener("beforeunload", function() {
-            // Clear any pending timeouts
-            clearTimeout(recoveryTimeout);
-            // Stop the audio to release resources
-            var player = document.getElementById("globalPlayer");
-            if (player) {
-                player.pause();
-                player.src = '';
-            }
-        });
         
         
         // ── Toggle playback ───────────────────────────────────────────
         
         function togglePlayback() {
-            if (streamError) {
-                // Try to reload if error state
-                var player = document.getElementById("globalPlayer");
-                var s = stations[cardSelections[currentSlot]];
-                player.src = s.url;
-                player.load();
-                player.play();
-                streamError = false;
-                return;
-            }
-            
+            if (streamError) return;
             var player = document.getElementById("globalPlayer");
             var btn = document.getElementById("masterPauseBtn");
         
@@ -997,6 +816,24 @@
         
         function cancelTimer() {
             resetTimer();
+        }
+
+        function handleStreamStall() {
+            var player = document.getElementById("globalPlayer");
+        
+            // Show reconnecting status immediately
+            document.getElementById(statSelected).style.color = "#f5a623";
+            document.getElementById(statSelected).innerText = "⟳ Reconnecting...";
+        
+            // Wait 5 seconds then attempt auto-recovery
+            setTimeout(function() {
+                if (!player.paused && player.readyState < 3) {
+                    var currentSrc = player.src;
+                    player.src = currentSrc;
+                    player.load();
+                    player.play();
+                }
+            }, 5000);
         }
         
     </script>
