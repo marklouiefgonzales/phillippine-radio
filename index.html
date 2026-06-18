@@ -321,8 +321,7 @@
         }
         .timer-select {
             width: 100%;
-            padding: 10px 14px;
-            padding-right: 32px;
+            padding: 10px 40px 10px 14px;
             border-radius: 10px;
             border: 1px solid #444;
             background: #121212;
@@ -330,6 +329,11 @@
             font-size: 14px;
             outline: none;
             cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaaaaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
         }
         .timer-select:focus {
             border-color: #0084ff;
@@ -349,6 +353,11 @@
         }
         .timer-set-btn:hover {
             background: #006fd6;
+        }
+        .timer-set-btn:disabled {
+            background: #333;
+            color: #555;
+            cursor: not-allowed;
         }
 
         
@@ -394,7 +403,7 @@
             <div class="modal-box">
                 <h3>⏱ Sleep Timer</h3>
                 <div class="timer-dropdowns">
-                    <select id="timerHours" class="timer-select">
+                    <select id="timerHours" class="timer-select" onchange="checkTimerInputs()">
                         <option value="0">0 hr</option>
                         <option value="1">1 hr</option>
                         <option value="2">2 hr</option>
@@ -421,8 +430,9 @@
                         <option value="23">23 hr</option>
                         <option value="24">24 hr</option>
                     </select>
-                    <select id="timerMinutes" class="timer-select">
+                    <select id="timerMinutes" class="timer-select" onchange="checkTimerInputs()">
                         <option value="0">0 min</option>
+                        <option value="1">1 min ← TEST</option>
                         <option value="5">5 min</option>
                         <option value="10">10 min</option>
                         <option value="15">15 min</option>
@@ -436,7 +446,7 @@
                         <option value="55">55 min</option>
                     </select>
                 </div>
-                <button class="timer-set-btn" onclick="applyCustomTimer()">Set Timer</button>
+                <button class="timer-set-btn" id="timerSetBtn" onclick="applyCustomTimer()" disabled>Set Timer</button>
                 <button class="modal-cancel" onclick="closeTimerModal()">Cancel</button>
             </div>
         </div>
@@ -711,7 +721,8 @@
         
         function openTimerModal() {
             document.getElementById("timerHours").value = "0";
-            document.getElementById("timerMinutes").value = "30";
+            document.getElementById("timerMinutes").value = "0";
+            document.getElementById("timerSetBtn").disabled = true;
             document.getElementById("timerModalOverlay").classList.add("open");
         }
         
@@ -779,19 +790,23 @@
             sleepSecondsLeft = 0;
         
             var player = document.getElementById("globalPlayer");
-            if (player.volume === 0) {
-                player.volume = 1;
-                player.pause();
-                var btn = document.getElementById("masterPauseBtn");
-                btn.innerHTML = '<div class="play-icon"></div>';
-                btn.style.background = "#34c759";
-                btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
-                document.getElementById(statSelected).innerText = "● Paused";
-            }
+            player.volume = 1;
+            player.pause();
+            var btn = document.getElementById("masterPauseBtn");
+            btn.innerHTML = '<div class="play-icon"></div>';
+            btn.style.background = "#34c759";
+            btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
+            document.getElementById(statSelected).innerText = "● Paused";
         
             var timerBtn = document.getElementById("sleepTimerBtn");
             timerBtn.innerText = "⏱ Sleep Timer";
             timerBtn.classList.remove("active");
+        }
+
+        function checkTimerInputs() {
+            var hours = parseInt(document.getElementById("timerHours").value);
+            var minutes = parseInt(document.getElementById("timerMinutes").value);
+            document.getElementById("timerSetBtn").disabled = (hours === 0 && minutes === 0);
         }
         
     </script>
