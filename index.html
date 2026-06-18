@@ -10,7 +10,11 @@
 <!-- marksays: 6/17/26 Nevermind that comment, nalagyan ko na rin ng search function kasi ang haba na nung selection nung nilagay ko lahat ng stations sa Metro Manila e -->
 <!-- marksays: 6/17/26 I also added the notification display on mobile when minimized -->    
 <!-- marksays: 6/17/26 I'm tempted to add the icon of each radio station but it might make "less minimalist". I think the catch phrase / tagline should be enough. -->
-<!-- marksays: 6/17/26 I might add a share function sa future (may ginawa si Johneric mukhang ok rin e), di ko lang makita pa kung may use case ba sa kin -->    
+<!-- marksays: 6/17/26 I might add a share function sa future (may ginawa si Johneric mukhang ok rin e), di ko lang makita pa kung may use case ba sa kin -->
+<!-- marksays: 6/18/26 Removed the link to other radio stations since that site is full of ads -- defeats my ad-free minimalist approach -->
+<!-- marksays: 6/18/26 Added the timer feature -->
+    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -278,7 +282,56 @@
         .search-box:focus {
             border-color: #0084ff;
         }
-
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 440px;
+        }
+        .timer-label {
+            font-size: 12px;
+            color: #aaaaaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .timer-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .timer-btn {
+            background: #1e1e1e;
+            color: #aaaaaa;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .timer-btn:hover {
+            background: #0084ff;
+            color: #fff;
+            border-color: #0084ff;
+        }
+        .timer-active-btn {
+            background: #222630;
+            color: #0084ff;
+            border: 1px solid #0084ff;
+            border-radius: 20px;
+            padding: 10px 24px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        .timer-active-btn:hover {
+            background: #ff3b30;
+            color: #fff;
+            border-color: #ff3b30;
+        }
 
         
     </style>
@@ -317,9 +370,20 @@
             </button>
         </div>
 
-        <a href="https://radio-philippines.com" target="_blank" class="explore-btn">
-            🌐 Explore More Philippine Stations
-        </a>
+        <div class="timer-section">
+            <div class="timer-label">Sleep Timer</div>
+            <div class="timer-buttons">
+                <button class="timer-btn" onclick="setTimer(15)">15m</button>
+                <button class="timer-btn" onclick="setTimer(30)">30m</button>
+                <button class="timer-btn" onclick="setTimer(60)">60m</button>
+                <button class="timer-btn" onclick="setCustomTimer()">Custom</button>
+            </div>
+            <button class="timer-active-btn" id="timerActiveBtn" onclick="cancelTimer()" style="display:none;">
+                ⏱ <span id="timerCountdown"></span> — Tap to Cancel
+            </button>
+        </div>
+
+        
     </div>
 
     <!-- Station Picker Modal -->
@@ -571,6 +635,95 @@
                 option.style.display = text.includes(query) ? "flex" : "none";
             });
         }
+
+        // marksays: this is the timer part
+        var sleepTimer = null;
+        var sleepFadeInterval = null;
+        var sleepSecondsLeft = 0;
+        var sleepCountdownInterval = null;
+        
+        function setTimer(minutes) {
+            cancelTimer();
+            sleepSecondsLeft = minutes * 60;
+            startTimer();
+        }
+        
+        function setCustomTimer() {
+            var input = prompt("Enter minutes (e.g. 45):");
+            if (input === null) return;
+            var minutes = parseInt(input);
+            if (isNaN(minutes) || minutes <= 0) {
+                alert("Please enter a valid number of minutes.");
+                return;
+            }
+            cancelTimer();
+            sleepSecondsLeft = minutes * 60;
+            startTimer();
+        }
+        
+        function startTimer() {
+            var activeBtn = document.getElementById("timerActiveBtn");
+            activeBtn.style.display = "block";
+            updateCountdownDisplay();
+        
+            sleepCountdownInterval = setInterval(function() {
+                sleepSecondsLeft--;
+                updateCountdownDisplay();
+        
+                if (sleepSecondsLeft === 30) {
+                    startFadeOut();
+                }
+        
+                if (sleepSecondsLeft <= 0) {
+                    cancelTimer();
+                }
+            }, 1000);
+        }
+        
+        function updateCountdownDisplay() {
+            var mins = Math.floor(sleepSecondsLeft / 60);
+            var secs = sleepSecondsLeft % 60;
+            document.getElementById("timerCountdown").innerText =
+                mins + ":" + (secs < 10 ? "0" : "") + secs;
+        }
+        
+        function startFadeOut() {
+            var player = document.getElementById("globalPlayer");
+            var originalVolume = player.volume;
+            var steps = 30;
+            var stepSize = originalVolume / steps;
+        
+            sleepFadeInterval = setInterval(function() {
+                if (player.volume > stepSize) {
+                    player.volume = Math.max(0, player.volume - stepSize);
+                } else {
+                    player.volume = 0;
+                    clearInterval(sleepFadeInterval);
+                }
+            }, 1000);
+        }
+        
+        function cancelTimer() {
+            clearInterval(sleepCountdownInterval);
+            clearInterval(sleepFadeInterval);
+            sleepCountdownInterval = null;
+            sleepFadeInterval = null;
+            sleepSecondsLeft = 0;
+        
+            var player = document.getElementById("globalPlayer");
+            if (player.volume === 0) {
+                player.volume = 1;
+                player.pause();
+                var btn = document.getElementById("masterPauseBtn");
+                btn.innerHTML = '<div class="play-icon"></div>';
+                btn.style.background = "#34c759";
+                btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
+                document.getElementById(statSelected).innerText = "● Paused";
+            }
+        
+            document.getElementById("timerActiveBtn").style.display = "none";
+        }
+        
         
 
     </script>
