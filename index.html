@@ -39,10 +39,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            padding: 40px 20px;
+            padding: 0 20px;
             box-sizing: border-box;
+            overflow: hidden;
         }
         .main-wrapper {
             display: flex;
@@ -300,70 +301,19 @@
             box-shadow: 0 0 15px rgba(0, 132, 255, 0.4);
             transform: translateY(-2px);
         }
-        .timer-pill {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
+        .sleep-timer-btn.active {
             background: #222630;
-            border: 1px solid #0084ff;
             color: #0084ff;
-            border-radius: 30px;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 4px 16px rgba(0, 132, 255, 0.3);
-            white-space: nowrap;
-            z-index: 200;
-        }
-        .timer-pill-cancel {
-            color: #ff3b30;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .timer-pill-cancel:hover {
-            text-decoration: underline;
-        }
-        .timer-presets {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        .timer-preset-btn {
-            background: #1e1e1e;
-            color: #aaaaaa;
-            border: 1px solid #333;
-            border-radius: 20px;
-            padding: 8px 18px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex: 1;
-        }
-        .timer-preset-btn:hover {
-            background: #0084ff;
-            color: #fff;
             border-color: #0084ff;
+            box-shadow: 0 0 15px rgba(0, 132, 255, 0.2);
         }
-        .timer-divider {
-            text-align: center;
-            color: #555;
-            font-size: 12px;
-            margin-bottom: 16px;
-            position: relative;
+        .sleep-timer-btn.active:hover {
+            background: #ff3b30;
+            color: #fff;
+            border-color: #ff3b30;
+            box-shadow: 0 0 15px rgba(255, 59, 48, 0.3);
+            transform: none;
         }
-        .timer-divider::before,
-        .timer-divider::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            width: 28%;
-            height: 1px;
-            background: #333;
-        }
-        .timer-divider::before { left: 0; }
-        .timer-divider::after { right: 0; }
         .timer-dropdowns {
             display: flex;
             gap: 12px;
@@ -372,6 +322,7 @@
         .timer-select {
             width: 100%;
             padding: 10px 14px;
+            padding-right: 32px;
             border-radius: 10px;
             border: 1px solid #444;
             background: #121212;
@@ -437,21 +388,11 @@
             </button>
         </div>
         <!-- Start of Timer Section -->
-        <button class="sleep-timer-btn" onclick="openTimerModal()">⏱ Sleep Timer</button>
+        <button class="sleep-timer-btn" id="sleepTimerBtn" onclick="handleTimerBtnClick()">⏱ Sleep Timer</button>
 
-        <div class="timer-pill" id="timerPill" style="display:none;">
-            ⏱ <span id="timerCountdown"></span> &nbsp;·&nbsp; <span class="timer-pill-cancel" onclick="cancelTimer()">Cancel</span>
-        </div>
-        
         <div class="modal-overlay" id="timerModalOverlay">
             <div class="modal-box">
                 <h3>⏱ Sleep Timer</h3>
-                <div class="timer-presets">
-                    <button class="timer-preset-btn" onclick="applyPreset(15)">15 min</button>
-                    <button class="timer-preset-btn" onclick="applyPreset(30)">30 min</button>
-                    <button class="timer-preset-btn" onclick="applyPreset(60)">60 min</button>
-                </div>
-                <div class="timer-divider">or set custom time</div>
                 <div class="timer-dropdowns">
                     <select id="timerHours" class="timer-select">
                         <option value="0">0 hr</option>
@@ -460,6 +401,25 @@
                         <option value="3">3 hr</option>
                         <option value="4">4 hr</option>
                         <option value="5">5 hr</option>
+                        <option value="6">6 hr</option>
+                        <option value="7">7 hr</option>
+                        <option value="8">8 hr</option>
+                        <option value="9">9 hr</option>
+                        <option value="10">10 hr</option>
+                        <option value="11">11 hr</option>
+                        <option value="12">12 hr</option>
+                        <option value="13">13 hr</option>
+                        <option value="14">14 hr</option>
+                        <option value="15">15 hr</option>
+                        <option value="16">16 hr</option>
+                        <option value="17">17 hr</option>
+                        <option value="18">18 hr</option>
+                        <option value="19">19 hr</option>
+                        <option value="20">20 hr</option>
+                        <option value="21">21 hr</option>
+                        <option value="22">22 hr</option>
+                        <option value="23">23 hr</option>
+                        <option value="24">24 hr</option>
                     </select>
                     <select id="timerMinutes" class="timer-select">
                         <option value="0">0 min</option>
@@ -736,9 +696,18 @@
         }
 
         // marksays: this is the timer part
+        // marksays: this is the timer part
         var sleepFadeInterval = null;
         var sleepSecondsLeft = 0;
         var sleepCountdownInterval = null;
+        
+        function handleTimerBtnClick() {
+            if (sleepCountdownInterval) {
+                cancelTimer();
+            } else {
+                openTimerModal();
+            }
+        }
         
         function openTimerModal() {
             document.getElementById("timerHours").value = "0";
@@ -748,11 +717,6 @@
         
         function closeTimerModal() {
             document.getElementById("timerModalOverlay").classList.remove("open");
-        }
-        
-        function applyPreset(minutes) {
-            closeTimerModal();
-            startSleepTimer(minutes * 60);
         }
         
         function applyCustomTimer() {
@@ -770,18 +734,17 @@
         function startSleepTimer(seconds) {
             cancelTimer();
             sleepSecondsLeft = seconds;
-            document.getElementById("timerPill").style.display = "block";
-            updateCountdownDisplay();
+            updateTimerBtn();
         
             sleepCountdownInterval = setInterval(function() {
                 sleepSecondsLeft--;
-                updateCountdownDisplay();
+                updateTimerBtn();
                 if (sleepSecondsLeft === 30) startFadeOut();
                 if (sleepSecondsLeft <= 0) cancelTimer();
             }, 1000);
         }
         
-        function updateCountdownDisplay() {
+        function updateTimerBtn() {
             var h = Math.floor(sleepSecondsLeft / 3600);
             var m = Math.floor((sleepSecondsLeft % 3600) / 60);
             var s = sleepSecondsLeft % 60;
@@ -789,7 +752,9 @@
             if (h > 0) display += h + "h ";
             display += (m < 10 && h > 0 ? "0" : "") + m + "m ";
             display += (s < 10 ? "0" : "") + s + "s";
-            document.getElementById("timerCountdown").innerText = display.trim();
+            var btn = document.getElementById("sleepTimerBtn");
+            btn.innerText = "⏱ " + display.trim() + " — Tap to Cancel";
+            btn.classList.add("active");
         }
         
         function startFadeOut() {
@@ -823,11 +788,12 @@
                 btn.style.boxShadow = "0 4px 12px rgba(52, 199, 89, 0.3)";
                 document.getElementById(statSelected).innerText = "● Paused";
             }
-            document.getElementById("timerPill").style.display = "none";
+        
+            var timerBtn = document.getElementById("sleepTimerBtn");
+            timerBtn.innerText = "⏱ Sleep Timer";
+            timerBtn.classList.remove("active");
         }
         
-        
-
     </script>
 
 </body>
