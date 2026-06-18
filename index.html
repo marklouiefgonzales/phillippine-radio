@@ -821,17 +821,25 @@
         function handleStreamStall() {
             var player = document.getElementById("globalPlayer");
         
-            // Show reconnecting status immediately
             document.getElementById(statSelected).style.color = "#f5a623";
             document.getElementById(statSelected).innerText = "⟳ Reconnecting...";
         
-            // Wait 5 seconds then attempt auto-recovery
             setTimeout(function() {
                 if (!player.paused && player.readyState < 3) {
                     var currentSrc = player.src;
                     player.src = currentSrc;
                     player.load();
-                    player.play();
+                    var playPromise = player.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(function() {
+                            document.getElementById(statSelected).style.color = "#0084ff";
+                            document.getElementById(statSelected).innerText = "● Now Playing";
+                        });
+                    }
+                } else {
+                    // Stream recovered on its own
+                    document.getElementById(statSelected).style.color = "#0084ff";
+                    document.getElementById(statSelected).innerText = "● Now Playing";
                 }
             }, 5000);
         }
