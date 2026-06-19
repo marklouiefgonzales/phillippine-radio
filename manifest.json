@@ -1,15 +1,15 @@
 {
   "name": "Philippine Radio",
   "short_name": "PH Radio",
-  "start_url": "/philippine-radio/",
+  "start_url": "/phillippine-radio/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#0084ff",
   "icons": [
     {
-      "src": "IconF.jpg",
+      "src": "iconF.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
