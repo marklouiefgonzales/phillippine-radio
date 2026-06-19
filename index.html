@@ -37,11 +37,6 @@
     <link rel="apple-touch-icon" href="iconF.png">
     <title>Gonzales Radio</title>
     <style>
-        /* Hide any preloaded favicon display */
-        link[rel="icon"], 
-        link[rel="apple-touch-icon"] {
-            display: none;
-        }
         body {
             background-color: #121212;
             color: #ffffff;
@@ -410,7 +405,7 @@
 <body>
     <!-- SPLASH SCREEN -->
     <div id="splash">
-        <img src="iconF.png" alt="Gonzales Radio Splash">
+        <img id="splashImage" src="" alt="Gonzales Radio Splash">
     </div>
     
     <div class="main-wrapper" id="mainApp">
@@ -515,11 +510,16 @@
     <script>
 
         // Splash screen - force at least 3 seconds display
-        (function() {
+        function initSplash() {
             var splash = document.getElementById('splash');
             var mainApp = document.getElementById('mainApp');
+            var splashImage = document.getElementById('splashImage');
+            
+            // Load the image with cache-busting
+            splashImage.src = 'iconF.png?v=' + Date.now();
+            
             var startTime = Date.now();
-            var minDisplay = 3000; // 3 seconds
+            var minDisplay = 3000;
         
             function hideSplash() {
                 splash.classList.add('hidden');
@@ -544,7 +544,10 @@
             } else {
                 window.addEventListener('load', checkAndHide);
             }
-        })();
+        }
+        
+        // Call the function
+        initSplash();
 
 
 
