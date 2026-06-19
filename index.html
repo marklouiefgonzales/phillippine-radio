@@ -63,11 +63,14 @@
             pointer-events: none;
             display: flex;
             justify-content: center;
-            align-items: center; /* ← CHANGED TO CENTER */
+            align-items: center;
         }
+        
         #splash img {
             width: 100%;
             height: auto;
+            max-height: 100vh; /* Prevents image from exceeding viewport height */
+            object-fit: contain; /* Keeps image fully visible */
             display: block;
         }
         #splash.hidden {
