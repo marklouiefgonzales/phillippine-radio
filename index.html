@@ -50,37 +50,7 @@
             box-sizing: border-box;
             overflow: hidden;
         }
-        /* Splash screen - full width, stays 3 seconds */
-        #splash {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0b0b0b;
-            z-index: 9999;
-            transition: opacity 0.6s ease;
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #splash img {
-            width: min(100%, 100vw);
-            height: auto;
-            max-height: 100vh;
-            display: block;
-            flex-shrink: 0;
-        }
-        
-        #splash.hidden {
-            opacity: 0;
-        }
-        /* Main app starts hidden */
         .main-wrapper {
-            opacity: 0;
-            transition: opacity 0.7s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -88,10 +58,6 @@
             width: 100%;
             max-width: 800px;
         }
-        .main-wrapper.show {
-            opacity: 1;
-        }
-
         .cards-container {
             display: flex;
             justify-content: center;
@@ -403,12 +369,8 @@
     </style>
 </head>
 <body>
-    <!-- SPLASH SCREEN -->
-    <div id="splash">
-        <img id="splashImage" src="" alt="Gonzales Radio Splash">
-    </div>
-    
-    <div class="main-wrapper" id="mainApp">
+
+    <div class="main-wrapper">
 
         <div class="cards-container">
             <div class="player-container active" id="card1" onclick="playStream(0, 'card1')">
@@ -509,49 +471,6 @@
 
     <script>
 
-        // Splash screen - force at least 3 seconds display
-        function initSplash() {
-            var splash = document.getElementById('splash');
-            var mainApp = document.getElementById('mainApp');
-            var splashImage = document.getElementById('splashImage');
-            
-            // Load the image with cache-busting
-            splashImage.src = 'iconF.png?v=' + Date.now();
-            
-            var startTime = Date.now();
-            var minDisplay = 3000;
-        
-            function hideSplash() {
-                splash.classList.add('hidden');
-                mainApp.classList.add('show');
-                setTimeout(function() {
-                    splash.style.display = 'none';
-                }, 700);
-            }
-        
-            function checkAndHide() {
-                var elapsed = Date.now() - startTime;
-                if (elapsed >= minDisplay) {
-                    hideSplash();
-                } else {
-                    var remaining = minDisplay - elapsed;
-                    setTimeout(hideSplash, remaining);
-                }
-            }
-        
-            if (document.readyState === 'complete') {
-                checkAndHide();
-            } else {
-                window.addEventListener('load', checkAndHide);
-            }
-        }
-        
-        // Call the function
-        initSplash();
-
-
-
-        
         // ============================================================
         // marksays: ADD OR EDIT STATIONS HERE
         // Each station: { freq, name, tagline, url }
