@@ -64,14 +64,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Prevents scrollbars */
         }
         
         #splash img {
             width: 100%;
+            max-width: 100vw;
             height: auto;
-            min-height: 100vh; /* Forces image to at least fill viewport height */
-            object-fit: cover; /* Crops image to fill container */
+            max-height: 100vh;
             display: block;
         }
         #splash.hidden {
