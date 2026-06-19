@@ -50,6 +50,37 @@
             box-sizing: border-box;
             overflow: hidden;
         }
+        /* Splash screen - full width, stays 3 seconds */
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0b0b0b;
+            z-index: 9999;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+        #splash img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        #splash.hidden {
+            opacity: 0;
+        }
+        /* Main app starts hidden */
+        .main-wrapper {
+            opacity: 0;
+            transition: opacity 0.7s ease;
+        }
+        .main-wrapper.show {
+            opacity: 1;
+        }
+
+        
         .main-wrapper {
             display: flex;
             flex-direction: column;
@@ -369,8 +400,12 @@
     </style>
 </head>
 <body>
-
-    <div class="main-wrapper">
+    <!-- SPLASH SCREEN -->
+    <div id="splash">
+        <img src="iconF.png" alt="Gonzales Radio Splash" style="width:100%; height:100%; object-fit:cover; display:block;">
+    </div>
+    
+    <div class="main-wrapper" id="mainApp">
 
         <div class="cards-container">
             <div class="player-container active" id="card1" onclick="playStream(0, 'card1')">
@@ -471,6 +506,41 @@
 
     <script>
 
+        // Splash screen - force at least 3 seconds display
+        (function() {
+            var splash = document.getElementById('splash');
+            var mainApp = document.getElementById('mainApp');
+            var startTime = Date.now();
+            var minDisplay = 3000; // 3 seconds
+        
+            function hideSplash() {
+                splash.classList.add('hidden');
+                mainApp.classList.add('show');
+                setTimeout(function() {
+                    splash.style.display = 'none';
+                }, 700);
+            }
+        
+            function checkAndHide() {
+                var elapsed = Date.now() - startTime;
+                if (elapsed >= minDisplay) {
+                    hideSplash();
+                } else {
+                    var remaining = minDisplay - elapsed;
+                    setTimeout(hideSplash, remaining);
+                }
+            }
+        
+            if (document.readyState === 'complete') {
+                checkAndHide();
+            } else {
+                window.addEventListener('load', checkAndHide);
+            }
+        })();
+
+
+
+        
         // ============================================================
         // marksays: ADD OR EDIT STATIONS HERE
         // Each station: { freq, name, tagline, url }
