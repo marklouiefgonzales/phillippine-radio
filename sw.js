@@ -1,4 +1,4 @@
-var CACHE_VERSION = 'v19'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
+var CACHE_VERSION = 'v20'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
 
 self.addEventListener('install', function(event) {
     self.skipWaiting();
@@ -17,5 +17,10 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+    // Don't cache the splash image to prevent dimension issues
+    if (event.request.url.includes('iconF.png')) {
+        event.respondWith(fetch(event.request, { cache: 'no-store' }));
+        return;
+    }
     event.respondWith(fetch(event.request));
 });
