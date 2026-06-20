@@ -1,4 +1,4 @@
-var CACHE_VERSION = 'v25'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
+var CACHE_VERSION = 'v26'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
 
 self.addEventListener('install', function(event) {
     self.skipWaiting();
