@@ -1,4 +1,4 @@
-var CACHE_VERSION = 'v28'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
+var CACHE_VERSION = 'v29'; // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
 
 var CACHE_NAME = 'my-cache-' + CACHE_VERSION;
 
