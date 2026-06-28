@@ -1,5 +1,5 @@
 //var CACHE_VERSION = 'v' + eval('Date.now()'); // <-- change to whatever value to force devices to download the latest version of the script (just for rare cases that their device maintained old code
-var CACHE_VERSION = 'v' + eval('Date.now()'); // <-- Date.now() don't work on some servers. eval forces it.
+var CACHE_VERSION = 'v' + Math.floor(Math.random() * 1000000) + Date.now(); // <-- Date.now() don't work on some servers. eval forces it.
 var CACHE_NAME = 'my-cache-' + CACHE_VERSION;
 
 // Install - cache your files
